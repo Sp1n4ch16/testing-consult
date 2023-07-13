@@ -33,7 +33,7 @@ const { Socket } = require("socket.io");
 const { v4: uuidv4 } = require("uuid");
 const MongoClient = require("mongodb").MongoClient;
 const http = require("http");
-const server = http.createServer(app);
+const httpServer = http.createServer(app);
 /*const https = require("https");
 const sslServer = https.createServer(
   {
@@ -42,7 +42,7 @@ const sslServer = https.createServer(
   },
   app
 );*/
-const io = require("socket.io")(server, { cors: { origin: "*" } });
+const io = require("socket.io")(httpServer, { cors: { origin: "*" } });
 
 require("dotenv").config();
 const templatePath = path.join(__dirname, "../templates");
@@ -134,7 +134,7 @@ io.on("connection", socket => {
 const { ExpressPeerServer } = require("peer");
 const { name } = require("ejs");
 const { hostname } = require("os");
-const peerServer = ExpressPeerServer(http, {
+const peerServer = ExpressPeerServer(httpServer, {
   debug: true,
 });
 
@@ -914,4 +914,6 @@ app.post(
   }
 );
 
-server.listen(3000, () => console.log("secure server running on port 3000"));
+httpServer.listen(3000, () =>
+  console.log("secure server running on port 3000")
+);
