@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="stylesheet" href="./loginFailed.css" />
+  </head>
+  <body>
+    <div class="container">
+      <div class="popup" id="popup">
+        <img src="error.png" alt="Error" />
+        <h2>Appointment Failed!</h2>
+        <p>Already Booked</p>
+        <input type="submit" value="OK" onclick="document.location= './POnlineConsult' " />
+      </div>
+    </div>
+  </body>
+
+  <script>
+    let popup = document.getElementById("popup");
+    function openPopup() {
+      popup.classList.add("open-popup");
+    }
+    module.export = {
+      openPopup,
+    };
+  </script>
+</html>

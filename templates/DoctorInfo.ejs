@@ -1,0 +1,63 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=, initial-scale=1.0" />
+    <title>Register</title>
+    <link rel="stylesheet" href="/register.css" />
+    <link rel="stylesheet" href="/jquery.datetimepicker.min.css" />
+    <script src="/jquery.js"></script>
+    <script src="/jquery.datetimepicker.full.min.js"></script>
+  </head>
+  <body>
+    <div class="center">
+      <form action="/doctorInfo" method="post" id="myForm">
+        <h1>Doctor Information</h1>
+        <div class="txt_field">
+          <input type="text" name="doctorName" required />
+          <label>Doctor Name</label>
+        </div>
+        <div class="txt_field">
+          <input id="datetime" name="date" required />
+          <label>Select Time to Disable</label>
+        </div>
+        <div class="txt_field">
+          <input type="text" name="consultationFee" required />
+          <label>Consultation Fee</label>
+        </div>
+        <input type="submit" value="Submit" onclick="submitButton()" />
+      </form>
+    </div>
+
+    <script>
+      //$("#date").datetimepicker();
+      $(document).ready(function () {
+        $("#datetime").datetimepicker({
+          format: "Y-m-d H:i",
+          step: 30, // Set the step to 30 minutes
+          allowTimes: [
+            "08:00",
+            "08:30",
+            "09:00",
+            "09:30",
+            "10:00",
+            "10:30",
+            "11:00",
+            "11:30",
+            "12:00",
+            "12:30",
+            "13:00",
+            "13:30",
+            "14:00",
+            "14:30",
+            "15:00",
+            "15:30",
+            "16:00",
+            "16:30",
+            "17:00",
+          ],
+        });
+      });
+    </script>
+  </body>
+</html>

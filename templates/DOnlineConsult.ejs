@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/DOnlineConsult.css" />
+    <title>Document</title>
+  </head>
+  <body>
+    <main class="table">
+        <section class="table_header">
+          <h1>Online Appointment Schedule</h1>
+        </section>
+        <section class="table_body">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Age</th>
+                <th>Gender</th>
+                <th>Description</th>
+                <th>Date</th>
+                <th>Paid</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% onlineConsultList.forEach(onlineConsult => { %>
+              <tr>
+                <td><%= onlineConsult._id %></td>
+                <td><%= onlineConsult.name %></td>
+                <td><%= onlineConsult.age %></td>
+                <td><%= onlineConsult.gender %></td>
+                <td><%= onlineConsult.description %></td>
+                <td><%= onlineConsult.formattedDate %></td>
+                <td><%= onlineConsult.paid %></td>
+                <td><%= onlineConsult.status %></td>
+                <td>
+                  <button onclick="document.location= './Droom' "<%= onlineConsult.enabled ? '' : 'enabled' %>>Join</button>
+                  <button class="approve-button">Approve</button>
+                  <button class="cancel-button">Cancel</button>
+                </td>
+              </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </section>
+
+
+        <script>
+
+          const approveButtons = document.querySelectorAll('.approve-button');
+
+          approveButtons.forEach((button) => {
+            button.addEventListener('click', async () => {
+              const appointmentId = button.closest('tr').querySelector('td:first-child').textContent;
+
+              try {
+                const response = await fetch('/approve-appointment', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify({ appointmentId }),
+                });
+
+                if (response.ok) {
+                  // Refresh the page after successful cancellation
+                  location.reload();
+                } else {
+                  console.error('Appointment approving failed:', response);
+                }
+              } catch (error) {
+                console.log(error);
+              }
+            });
+          });
+
+        </script>
+  </body>
+</html>

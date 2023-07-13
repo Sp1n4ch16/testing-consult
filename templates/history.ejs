@@ -1,0 +1,77 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Document</title>
+  <link rel="stylesheet" href="/myappointment.css" />
+</head>
+<body>
+      <main class="table">
+        <section class="table_header">
+          <h1>Appointment</h1>
+        </section>
+        <section class="table_body">
+          <table>
+            <thead>
+              <tr>
+                <th>Image</th>
+                <th>ID</th>
+                <th>Email</th>
+                <th>Age</th>
+                <th>Description</th>
+                <th>Services</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% historyList.forEach(history => { %>
+              <tr>
+                <td><div class="image"><img src="data: <%= history.image.contentType %>;base64,<%= history.image.data.toString('base64') %>" alt=""></div></td>
+                <td><%= history._id %></td>
+                <td><%= history.email %></td>
+                <td><%= history.age %></td>
+                <td><%= history.description %></td>
+                <td><%= history.services %></td>
+                <td><%= history.formattedDate %></td>
+              </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </section>
+        <section class="table_header">
+          <h1>Online Consultation Appointment</h1>
+        </section>
+        <section class="table_body">
+          <table>
+            <thead>
+              <tr>
+                <th>Image</th>
+                <th>ID</th>
+                <th>Email</th>
+                <th>Age</th>
+                <th>Description</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% consultHistoryList.forEach(consultHistory => { %>
+              <tr>
+                <td><div class="image"><img src="data: <%= consultHistory.image.contentType %>;base64,<%= consultHistory.image.data.toString('base64') %>" alt=""></div></td>
+                <td><%= consultHistory._id %></td>
+                <td><%= consultHistory.email %></td>
+                <td><%= consultHistory.age %></td>
+                <td><%= consultHistory.description %></td>
+                <td><%= consultHistory.formattedDate %></td>
+              </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </section>
+      </main>
+
+
+  <script>
+  </script>
+</body>
+</html>

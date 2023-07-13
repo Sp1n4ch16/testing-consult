@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Room</title>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+    <link rel="stylesheet" href="Droom.css" />
+    <script src="https://www.paypal.com/sdk/js?client-id=test&currency=USD"></script>
+    <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.4.7/peerjs.min.js"></script>
+    <script
+      src="https://cdn.socket.io/4.6.0/socket.io.min.js"
+      integrity="sha384-c79GN5VsunZvi+Q/WObgk2in0CbZsHnjEqvFxC5DxHn9lTfNce2WW6h2pH6u/kF+"
+      crossorigin="anonymous"
+    ></script>
+    <script>
+      const ROOM_ID = "<%= roomId %>";
+      const name = "<%= name %>"
+    </script>
+  </head>
+  <body>
+    <div class="main" id="main">
+      <div class="main__left">
+        <div class="main__videos">
+          <div id="video-grid"></div>
+         
+        </div>
+        <div class="main__controls">
+          <div class="main__controls_block">
+            <div
+              class="main__controls_button"
+              id="muteButton"
+              onclick="muteUnmute()"
+            >
+              <i class="fa fa-microphone"></i>
+              <span>Mute</span>
+            </div>
+            <div
+              class="main__controls_button"
+              id="playPauseVideo"
+              onclick="playStop()"
+            >
+              <i class="fa fa-video-camera"></i>
+              <span>Pause Video</span>
+            </div>
+          </div>
+
+          <div class="main__controls_block">
+            <div class="main__controls_button" id="Prescript"onclick="Prescription()">
+              <span>Prescription</span>
+            </div>
+          </div>
+
+          <div class="main__controls_block">
+            <div class="main__controls_button" id="ScreenRecord" onclick="startScreenRecording()">
+              <span>Screen Record</span>
+            </div>
+          </div>
+
+          <div class="main__controls_block">
+            <div class="main__controls_button leaveMeeting" id="leave-meeting"onclick="LeaveMeeting()">
+              <i class="fa fa-times"></i>
+              <span class="">Leave Meeting</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="main__right">
+        <div class="main__header">
+          <h6>Chat</h6>
+        </div>
+        <div class="main__chat__window" id="main__chat__window">
+          <ul class="messages" id="all_messages"></ul>
+        </div>
+        <div class="main__message_container">
+          <input
+            type="text"
+            id="chat_message"
+            placeholder="Type message here.."
+          />
+        </div>
+    </div>
+  </div>
+  </div>
+
+  <!--   PayPal Popup   -->
+   <div class="paypal-popup">
+      <div class="paypal-popup-content">
+        <img src="./close.jpg" alt="Close" class="paypal-close" />
+      </div>
+    </div>
+  
+  <!--   Gcash Popup   -->
+  <div class="gcash-popup">
+    <div class="gcash-popup-content">
+      <img src="./close.jpg" alt="Close" class="gcash-close" />
+    </div>
+  </div>
+
+  <!--   Presciption Popup   -->
+  <form action="/prescription" method="post" enctype="multipart/form-data" id="prescription">
+  <div class="prescription-popup">
+    <div class="prescription-popup-content">
+      <img src="./close.jpg" alt="Close" class="prescription-close" />
+      <input type="file" id="image" name="image" />
+      <input type="text" name="email" placeholder="Email">
+      <input type="submit">
+    </div>
+  </div>
+  </form>
+
+    <!--   Screen Record Popup   -->
+    <div class="screen-record-popup">
+      <div class="screen-record-content">
+        <img src="./close.jpg" alt="Close" class="screen-record-close" />
+        <video width="700" height="400" controls></video>
+      </div>
+    </div>
+
+  <!--   Leave Popup   -->
+  <div class="leave-popup">
+    <div class="leave-popup-content">
+      <img src="./close.jpg" alt="Close" class="leave-close" />
+      <h2>Are you sure you want to leave?</h2>
+      <input
+      type="submit"
+      value="Yes"
+      onclick="document.location= './DHome' "
+      />
+      <input
+      type="submit"
+      value="No"
+      onclick="LeaveMeeting()"
+      />
+    </div>
+  </div>
+
+  <script>
+
+    const socket = io();
+    const chatInputBox = document.getElementById("chat_message");
+    const all_messages = document.getElementById("all_messages");
+    const main__chat__window = document.getElementById("main__chat__window");
+    const videoGrid = document.getElementById("video-grid");
+    const myVideo = document.createElement("video");
+    const screen = document.getElementById("main");
+  
+    myVideo.muted = true;
+
+    var peer = new Peer();
+
+/*var peer = new Peer(undefined, {
+  host: "/",
+  port: "3001",
+});*/
+
+let myVideoStream;
+
+var getUserMedia =
+  navigator.getUserMedia ||
+  navigator.webkitGetUserMedia ||
+  navigator.mozGetUserMedia;
+
+navigator.mediaDevices
+  .getUserMedia({
+    video: true,
+    audio: true,
+  })
+  .then(stream => {
+    myVideoStream = stream;
+    addVideoStream(myVideo, stream);
+
+    peer.on("call", call => {
+      call.answer(stream);
+      const video = document.createElement("video");
+
+      call.on("stream", userVideoStream => {
+        addVideoStream(video, userVideoStream);
+      });
+    });
+
+    socket.on("connected", userId => {
+      connectToNewUser(userId, stream);
+    });
+    socket.on("user-disconnected", userId => {
+      if (peers[userId]) peers[userId].close();
+      video.delete()
+    });
+  });
+
+    //chat
+    socket.emit("join",name);
+
+    socket.on('user-connected',name=>{
+      let li = document.createElement("li");
+      li.innerHTML = `${name} has joined the room`;
+      all_messages.append(li);
+      main__chat__window.scrollTop = main__chat__window.scrollHeight;
+      chatInputBox.value = "";
+    })
+    socket.on('email-connected',email=>{
+      let li = document.createElement("li");
+      li.innerHTML = `Patient Email: ${email} `;
+      all_messages.append(li);
+      main__chat__window.scrollTop = main__chat__window.scrollHeight;
+      chatInputBox.value = "";
+    })
+    socket.on('user-disconnected',name=>{
+      let li = document.createElement("li");
+      li.innerHTML = `${name} has left the room`;
+      all_messages.append(li);
+      main__chat__window.scrollTop = main__chat__window.scrollHeight;
+      chatInputBox.value = "";
+    })
+    socket.on('chat-message', data => {
+      let li = document.createElement("li");
+      li.innerHTML = (`${data.name}: ${data.message}`);
+      all_messages.append(li);
+      main__chat__window.scrollTop = main__chat__window.scrollHeight;
+    })
+
+    document.addEventListener("keydown", (e) => {
+      if (e.which === 13 && chatInputBox.value != "") {
+        const msg=chatInputBox.value
+        let li = document.createElement("li");
+        li.innerHTML = "You: "+msg;
+        all_messages.append(li);
+        main__chat__window.scrollTop = main__chat__window.scrollHeight;
+        socket.emit("send-chat-message", chatInputBox.value);
+        chatInputBox.value = "";
+      }
+    });
+
+    //videocall function
+    peer.on("call", function (call) {
+        getUserMedia(
+          { video: true, audio: true },
+          function (stream) {
+            call.answer(stream); // Answer the call with an A/V stream.
+            const video = document.createElement("video");
+            call.on("stream", function (remoteStream) {
+              addVideoStream(video, remoteStream);
+            });
+          },
+          function (err) {
+            console.log("Failed to get local stream", err);
+          }
+        );
+      });
+
+      peer.on("open", id => {
+        socket.emit("join-room", ROOM_ID, id,name);
+      });
+
+      // CHAT
+      const connectToNewUser = (userId, streams) => {
+        const call = peer.call(userId, streams);
+        console.log(call);
+        const video = document.createElement("video");
+        call.on("stream", userVideoStream => {
+          console.log(userVideoStream);
+          addVideoStream(video, userVideoStream);
+        });
+        call.on('close',()=>{
+          video.remove();
+        })
+      };
+
+      const addVideoStream = (videoEl, stream) => {
+        videoEl.srcObject = stream;
+        videoEl.addEventListener("loadedmetadata", () => {
+          videoEl.play();
+        });
+
+        videoGrid.append(videoEl);
+      };
+
+      const playStop = () => {
+        let enabled = myVideoStream.getVideoTracks()[0].enabled;
+        if (enabled) {
+          myVideoStream.getVideoTracks()[0].enabled = false;
+          setPlayVideo();
+        } else {
+          setStopVideo();
+          myVideoStream.getVideoTracks()[0].enabled = true;
+        }
+      };
+
+      const muteUnmute = () => {
+        const enabled = myVideoStream.getAudioTracks()[0].enabled;
+        if (enabled) {
+          myVideoStream.getAudioTracks()[0].enabled = false;
+          setUnmuteButton();
+        } else {
+          setMuteButton();
+          myVideoStream.getAudioTracks()[0].enabled = true;
+        }
+      };
+
+      const setPlayVideo = () => {
+        const html = `<i class="unmute fa fa-pause-circle"></i>
+  <span class="unmute">Resume Video</span>`;
+        document.getElementById("playPauseVideo").innerHTML = html;
+      };
+
+      const setStopVideo = () => {
+        const html = `<i class=" fa fa-video-camera"></i>
+  <span class="">Pause Video</span>`;
+        document.getElementById("playPauseVideo").innerHTML = html;
+      };
+
+      const setUnmuteButton = () => {
+        const html = `<i class="unmute fa fa-microphone-slash"></i>
+  <span class="unmute">Unmute</span>`;
+        document.getElementById("muteButton").innerHTML = html;
+      };
+      const setMuteButton = () => {
+        const html = `<i class="fa fa-microphone"></i>
+  <span>Mute</span>`;
+        document.getElementById("muteButton").innerHTML = html;
+      };
+      function appendMessage(message) {
+        console.log(message)
+        let li = document.createElement("li");
+            li.innerHTML = message;
+            all_messages.append(li);
+            main__chat__window.scrollTop = main__chat__window.scrollHeight;
+      }
+
+
+      //Paypal
+      const PayPalPayment = () => {
+        document.querySelector(".paypal-popup").style.display = "flex";
+      };
+      document.querySelector(".paypal-close").addEventListener("click", function () {
+        document.querySelector(".paypal-popup").style.display = "none";
+      });
+
+      //Gcash
+      const GcashPayment = () => {
+        document.querySelector(".gcash-popup").style.display = "flex";
+      };
+      document.querySelector(".gcash-close").addEventListener("click", function () {
+        document.querySelector(".gcash-popup").style.display = "none";
+      });
+      //Prescription
+      const Prescription = () => {
+        document.querySelector(".prescription-popup").style.display = "flex";
+      };
+      document.querySelector(".prescription-close").addEventListener("click", function () {
+        document.querySelector(".prescription-popup").style.display = "none";
+      });
+      //Screen Record
+      const ScreenRecord = () => {
+        document.querySelector(".screen-record-popup").style.display = "flex";
+      };
+      document.querySelector(".screen-record-close").addEventListener("click", function () {
+        document.querySelector(".screen-record-popup").style.display = "none";
+      });
+
+
+       //LeaveMeeting
+       const LeaveMeeting = () => {
+        document.querySelector(".leave-popup").style.display = "flex";
+      };
+      document.querySelector(".leave-close").addEventListener("click", function () {
+        document.querySelector(".leave-popup").style.display = "none";
+      });
+
+
+      let mediaRecorder; // Global variable to store the MediaRecorder instance
+
+      // Function to start screen recording
+      function startScreenRecording() {
+        navigator.mediaDevices.getDisplayMedia({ video: true, audio: { echoCancellation: true } })
+          .then(function (stream) {
+            const video = document.querySelector(".screen-record-content video");
+            video.srcObject = stream;
+            video.muted = false;
+            video.play();
+
+            mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm; codecs=vp9,opus' });
+            const chunks = [];
+
+            mediaRecorder.ondataavailable = function (event) {
+              chunks.push(event.data);
+            };
+
+            mediaRecorder.onstop = function () {
+              const recordingBlob = new Blob(chunks, { type: "video/webm" });
+              const videoURL = URL.createObjectURL(recordingBlob);
+              const videoElement = document.createElement("video");
+              videoElement.src = videoURL;
+              videoElement.controls = true;
+              videoElement.width = "700";
+              videoElement.height = "400";
+              videoElement.muted = false; // Add this line
+
+              const recordingPopup = document.querySelector(
+                ".screen-record-popup"
+              );
+              const recordingContent = recordingPopup.querySelector(
+                ".screen-record-content"
+              );
+              recordingContent.innerHTML = ""; // Clear previous content
+              recordingContent.appendChild(videoElement);
+
+              recordingPopup.style.display = "flex";
+            };
+
+            mediaRecorder.start();
+          })
+          .catch(function (error) {
+            console.error("Error accessing screen recording:", error);
+          });
+      }
+
+      // Function to stop screen recording
+      function stopScreenRecording() {
+        if (mediaRecorder && mediaRecorder.state !== "inactive") {
+          mediaRecorder.stop();
+        }
+      }
+
+      // Function to handle the screen recording button click
+      function handleScreenRecord() {
+        const screenRecordButton = document.getElementById("ScreenRecord");
+        if (screenRecordButton.classList.contains("recording")) {
+          // Stop recording
+          stopScreenRecording();
+          screenRecordButton.classList.remove("recording");
+        } else {
+          // Start recording
+          startScreenRecording();
+          screenRecordButton.classList.add("recording");
+        }
+      }
+
+  </script>
+  </body>
+</html>

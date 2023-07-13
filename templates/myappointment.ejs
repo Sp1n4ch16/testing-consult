@@ -1,0 +1,149 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Document</title>
+  <link rel="stylesheet" href="/myappointment.css" />
+</head>
+<body>
+  <main class="table">
+    <section class="table_header">
+      <h1>Appointment</h1>
+    </section>
+    <section class="table_body">
+      <table>
+        <thead>
+          <tr>
+            <th>Image</th>
+            <th>ID</th>
+            <th>Email</th>
+            <th>Age</th>
+            <th>Description</th>
+            <th>Services</th>
+            <th>Date</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% appointmentList.forEach(appointment => { %>
+          <tr>
+            <td><div class="image"><img src="data: <%= appointment.image.contentType %>;base64,<%= appointment.image.data.toString('base64') %>" alt=""></div></td>
+            <td><%= appointment._id %></td>
+            <td><%= appointment.email %></td>
+            <td><%= appointment.age %></td>
+            <td class="description"><%= appointment.description %></td>
+            <td><%= appointment.services %></td>
+            <td id="tabledate">
+              <%= appointment.formattedDate %>
+            </td>
+            <td>
+              <button class="cancel-button">Cancel</button>
+              <button class="payment-button">Payment</button>
+            </td>
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </section>
+    <section class="table_header">
+      <h1>Online Consultation Appointment</h1>
+    </section>
+    <section class="table_body">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Age</th>
+            <th>Gender</th>
+            <th>Description</th>
+            <th>Date</th>
+            <th>Paid</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% onlineConsultList.forEach(onlineConsultation => { %>
+          <tr>
+            <td><%= onlineConsultation._id %></td>
+            <td><%= fullname %></td>
+            <td><%= age %></td>
+            <td><%= gender %></td>
+            <td class="description"><%= onlineConsultation.description %></td>
+            <td><%= onlineConsultation.formattedDate %></td>
+            <td><%= onlineConsultation.paid %></td>
+            <td><%= onlineConsultation.status %></td>
+            <td>
+              <button onclick="document.location= './room'" <%= onlineConsultation.enabled ? '' : 'enabled' %>>Join</button>
+              <button class="cancel-button">Cancel</button>
+              <button class="payment-button" <%= onlineConsultation.paymentEnabled ? '' : 'disabled' %>>Payment</button>
+            </td>
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </section>
+  </main>
+
+  <script>
+    const cancelButtons = document.querySelectorAll('.cancel-button');
+    const paymentButtons = document.querySelectorAll('.payment-button');
+
+    cancelButtons.forEach((button) => {
+      button.addEventListener('click', async () => {
+        const appointmentId = button.closest('tr').querySelector('td:first-child').textContent;
+
+        try {
+          const response = await fetch('/cancel-appointment', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ appointmentId }),
+          });
+
+          if (response.ok) {
+            // Refresh the page after successful cancellation
+            location.reload();
+          } else {
+            console.error('Appointment cancellation failed:', response);
+          }
+        } catch (error) {
+          console.log(error);
+        }
+      });
+    });
+
+    paymentButtons.forEach((button) => {
+      button.addEventListener('click', () => {
+        const appointmentId = button.closest('tr').querySelector('td:first-child').textContent;
+        submitPayment(appointmentId);
+        
+      });
+    });
+
+    function submitPayment(appointmentId) {
+    // Create a hidden form element
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '/pay';
+
+    // Create an input element to hold the appointmentId
+    const appointmentIdInput = document.createElement('input');
+    appointmentIdInput.type = 'hidden';
+    appointmentIdInput.name = 'appointmentId';
+    appointmentIdInput.value = appointmentId;
+
+    // Append the input element to the form
+    form.appendChild(appointmentIdInput);
+
+    // Append the form to the document body and submit it
+    document.body.appendChild(form);
+    form.submit();
+  }
+
+  </script>
+</body>
+</html>

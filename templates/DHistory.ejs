@@ -1,0 +1,81 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Document</title>
+  <link rel="stylesheet" href="/DHistory.css" />
+</head>
+<body>
+      <main class="table">
+        <section class="table_header">
+          <h1>Appointment</h1>
+        </section>
+        <section class="table_body">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Image</th>
+                <th>Description</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% historyList.forEach(history => { %>
+              <tr>
+                <td><%= history.id %></td>
+                <td><div class="image"><img src="data: <%= history.image.contentType %>;base64,<%= history.image.data.toString('base64') %>" alt=""></div></td>
+                <td class="description"><%= history.description %></td>
+                <td id="tabledate">
+                  <%= history.formattedDate %>
+                </td>
+                <td>
+                  <p class="status">Pending</p>
+                </td>
+              </tr>
+              <% }) %>
+            </tbody>
+          </table>
+          <section class="table_header">
+            <h1>Online Consultation</h1>
+          </section>
+          <section class="table_body">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Image</th>
+                  <th>Description</th>
+                  <th>Date</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% consultHistoryList.forEach(consultHistory => { %>
+                <tr>
+                  <td><%= consultHistory.id %></td>
+                  <td><div class="image"><img src="data: <%= consultHistory.image.contentType %>;base64,<%= consultHistory.image.data.toString('base64') %>" alt=""></div></td>
+                  <td class="description"><%= consultHistory.description %></td>
+                  <td id="tabledate">
+                    <%= consultHistory.formattedDate %>
+                  </td>
+                  <td>
+                    <p class="status">Pending</p>
+                  </td>
+                </tr>
+                <% }) %>
+              </tbody>
+            </table>
+      </main>
+
+
+  <script>
+    
+
+  </script>
+</body>
+</html>

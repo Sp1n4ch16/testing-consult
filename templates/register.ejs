@@ -1,0 +1,87 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=, initial-scale=1.0" />
+    <title>Register</title>
+    <link rel="stylesheet" href="/register.css" />
+    <link rel="stylesheet" href="/jquery.datetimepicker.min.css" />
+    <script src="/jquery.js"></script>
+    <script src="/jquery.datetimepicker.full.min.js"></script>
+  </head>
+  <body>
+    <div class="center">
+      <form action="/register" method="post" id="myForm">
+        <h1>Register</h1>
+        <div class="txt_field">
+          <input type="text" name="firstName" required />
+          <label>First Name</label>
+        </div>
+        <div class="txt_field">
+          <input type="text" name="lastName" required />
+          <label>Last Name</label>
+        </div>
+        <div class="txt_field">
+          <input type="text" name="contactNumber" required />
+          <label>Contact Number</label>
+        </div>
+        <div class="txt_field">
+          <input type="text" name="address" required />
+          <label>Address</label>
+        </div>
+        <div class="txt_field">
+          <input id="datetime" name="birthdate" required />
+          <label>Birthdate</label>
+        </div>
+
+        <label>Gender</label> <br />
+        <input type="radio" id="male" name="gender" value="Male" />
+        <label for="male">Male</label>
+        <input type="radio" id="female" name="gender" value="Female" />
+        <label for="female">Female</label>
+
+        <div class="txt_field">
+          <input type="text" name="email" required />
+          <label>Email</label>
+        </div>
+        <div class="txt_field">
+          <input type="password" name="password" required id="pass" />
+          <label>Password</label>
+        </div>
+        <div class="txt_field">
+          <input type="password" name="confirm_password" required id="cpass" />
+          <label>Confirm Password</label>
+        </div>
+        <input type="submit" value="Register" onclick="submitButton()" />
+      </form>
+    </div>
+
+    <script>
+      $(document).ready(function () {
+        $("#datetime").datetimepicker({
+          timepicker: false,
+          format: "Y-m-d",
+        });
+      });
+      document
+        .getElementById("myForm")
+        .addEventListener("submit", function (event) {
+          const pass = document.getElementById("pass").value;
+          const cpass = document.getElementById("cpass").value;
+
+          if (pass !== cpass) {
+            alert("Password and Confirm password didn't match");
+            var textInputs = document.querySelectorAll(
+              'input[type="password"]'
+            );
+            textInputs.forEach(function (input) {
+              input.value = "";
+            });
+            event.preventDefault();
+          } else {
+            alert("You're now registered!");
+          }
+        });
+    </script>
+  </body>
+</html>

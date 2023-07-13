@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script
+      src="https://cdn.socket.io/4.6.0/socket.io.min.js"
+      integrity="sha384-c79GN5VsunZvi+Q/WObgk2in0CbZsHnjEqvFxC5DxHn9lTfNce2WW6h2pH6u/kF+"
+      crossorigin="anonymous"
+    ></script>
+    <link rel="stylesheet" href="/chatroom.css" />
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1><%=email%></h1>
+        <input
+          class="video-call-button"
+          type="submit"
+          value="Video Call"
+          onclick="document.location= './room' "
+        />
+      </div>
+      <div id="message-container"></div>
+      <div class="footer">
+        <form id="send-container" action="">
+          <input type="text" id="message-input" />
+          <button type="submit" id="send-button">Send</button>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      const socket = io("https://localhost:3000");
+      const messageContainer = document.getElementById("message-container");
+      const messageForm = document.getElementById("send-container");
+      const messageInput = document.getElementById("message-input");
+
+      appendMessage("<%=username%> joined");
+      socket.emit("new-user", "<%=username%>");
+
+      socket.on("chat-message", data => {
+        appendMessage(`${data.name}: ${data.message}`);
+      });
+
+      socket.on("user-connected", name => {
+        appendMessage(`${name} connected`);
+      });
+
+      socket.on("user-disconnected", name => {
+        appendMessage(`${name} disconnected`);
+      });
+
+      messageForm.addEventListener("submit", e => {
+        e.preventDefault();
+        const message = messageInput.value;
+        appendMessage(`You: ${message}`);
+        socket.emit("send-chat-message", message);
+        messageInput.value = "";
+      });
+
+      function appendMessage(message) {
+        const messageElement = document.createElement("div");
+        messageElement.innerText = message;
+        messageContainer.append(messageElement);
+      }
+    </script>
+  </body>
+</html>

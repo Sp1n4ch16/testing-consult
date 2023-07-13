@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/DHome.css" />
+    <title>Document</title>
+  </head>
+  <body>
+    <% doctors.forEach((doctor) => { %>
+    <h3>Welcome <%= doctor.fullName %></h3>
+    <% }) %>
+    <div class="center">
+      <input
+        type="submit"
+        value="Appointment Schedule"
+        onclick="document.location= './DAppointment' "
+      />
+      <br />
+      <input
+        type="submit"
+        value="Online Appointment Schedule"
+        onclick="document.location= './DOnlineConsult' "
+      />
+      <br />
+      <input
+        type="submit"
+        value="History"
+        onclick="document.location= './DHistory' "
+      />
+      <br />
+      <input
+        type="submit"
+        value="Doctor Information"
+        onclick="document.location= './DoctorInfo' "
+      />
+    </div>
+  </body>
+</html>

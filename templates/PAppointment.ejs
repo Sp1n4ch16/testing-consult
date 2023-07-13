@@ -1,0 +1,68 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="stylesheet" href="/PAppointment.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  </head>
+
+  <body>
+    <div class="center">
+      <form action="/PAppointment" method="post" enctype="multipart/form-data">
+        <h1>Appointment</h1>
+        <div class="image">
+          <img src="./dentist.png" alt="Error" />
+        </div>
+        <div class="doctor">Dr. Ryan</div>
+        <div class="doctor"></div>
+        <div class="txt_field">
+          <input  name="age" required />
+          <label>Age</label>
+        </div>
+        <div class="txt_field">
+          <input id="datetime" name="date" required />
+          <label>Date</label>
+        </div>
+        <div class="txt_field">
+          <input type="text" name="description" required />
+          <label>Chief Complain</label>
+        </div>
+        <div class="services">
+          <select name="services" id="services" class="select" required>
+            <option value="" disabled selected>--Select Services--</option>
+            <option value="Consultation">Consultation</option>
+            <option value="Oral Exam">Oral Exam</option>
+            <option value="Oral Prophylaxis">Oral Prophylaxis</option>
+            <option value="Dental Restoration">Dental Restoration</option>
+            <option value="Dental Extraction">Dental Extraction</option>
+            <option value="Removal of Impacted tooth Surgical">Removal of Impacted tooth Surgical</option>
+            <option value="Facbrication of removal prosthesis">Facbrication of removal prosthesis</option>
+            <option value="Orthodentic treatment">Orthodentic treatment</option>
+            <option value="Aesthetic Dentistry">Aesthetic Dentistry</option>
+            <option value="Root Canal treatment">Root Canal treatment</option>
+          </select>.
+        </div>
+        <div class="photo">
+          <input type="file" id="image" name="image" />
+          <label for="image">Upload Image</label>
+        </div>
+        <input type="submit" value="Submit" />
+      </form>
+    </div>
+
+    <script>
+      flatpickr("#datetime", {
+        enableTime: true,
+        dateFormat: "Y-m-d H:i",
+        minDate: "today",
+        maxDate: new Date().fp_incr(14), // 14 days from now
+        time_24hr: true,
+        minTime: "08:00",
+        maxTime: "17:00"
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,50 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Online Consultation</title>
+    <link rel="stylesheet" href="/PConsult.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  </head>
+  <body>
+    <div class="center">
+      <form
+        action="/POnlineConsult"
+        method="post"
+        enctype="multipart/form-data"
+      >
+        <h1>Online Consultation Appointment</h1>
+        <div class="image">
+          <img src="/dentist.png" alt="Error" />
+        </div>
+        <% doctors.forEach((doctor) => { %>
+        <div class="doctor"><%= doctor.fullName %></div>
+        <div class="doctor">₱<%= doctor.consultation_fee %></div>
+        <% }) %>
+        <div class="txt_field">
+          <input id="datetime" name="date" required />
+          <label>Date</label>
+        </div>
+        <div class="txt_field">
+          <input type="text" name="description" required />
+          <label>Chief Complain</label>
+        </div>
+        <input type="submit" value="Submit" />
+      </form>
+    </div>
+
+    <script>
+      flatpickr("#datetime", {
+        enableTime: true,
+        dateFormat: "Y-m-d H:i",
+        minDate: "today",
+        maxDate: new Date().fp_incr(14), // 14 days from now
+        time_24hr: true,
+        minTime: "08:00",
+        maxTime: "17:00"
+      });
+    </script>
+  </body>
+</html>
