@@ -30,17 +30,19 @@ const {
   ScreenRecord,
 } = require("./mongodb");
 const { Socket } = require("socket.io");
-const https = require("https");
 const { v4: uuidv4 } = require("uuid");
 const MongoClient = require("mongodb").MongoClient;
+const http = require("http");
+const server = http.createServer(app);
+/*const https = require("https");
 const sslServer = https.createServer(
   {
     key: fs.readFileSync(path.join(__dirname, "cert", "key.pem")),
     cert: fs.readFileSync(path.join(__dirname, "cert", "cert.pem")),
   },
   app
-);
-const io = require("socket.io")(sslServer, { cors: { origin: "*" } });
+);*/
+const io = require("socket.io")(server, { cors: { origin: "*" } });
 
 require("dotenv").config();
 const templatePath = path.join(__dirname, "../templates");
@@ -131,7 +133,8 @@ io.on("connection", socket => {
 //peer
 const { ExpressPeerServer } = require("peer");
 const { name } = require("ejs");
-const peerServer = ExpressPeerServer(https, {
+const { hostname } = require("os");
+const peerServer = ExpressPeerServer(http, {
   debug: true,
 });
 
@@ -911,4 +914,4 @@ app.post(
   }
 );
 
-sslServer.listen(3000, () => console.log("secure server running on port 3000"));
+server.listen(3000, () => console.log("secure server running on port 3000"));
